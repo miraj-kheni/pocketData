@@ -29,18 +29,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-  /*      putMarker("20000", "buffer_size_kb");
-        putMarker("1", "events/kmem/kmalloc/enable");
-        putMarker("1", "events/kmem/kfree/enable");
-        putMarker("1", "events/kmem/kmem_cache_alloc/enable");
-        putMarker("1", "events/kmem/kmem_cache_free/enable");
-        putMarker("1", "events/sched/sched_switch/enable");
-        putMarker("1", "events/sched/sched_stat_runtime/enable");
-        putMarker("1", "events/power/cpu_frequency_switch_end/enable");
-        putMarker("1", "events/power/cpu_frequency_switch_start/enable");
-        putMarker("1", "events/power/cpu_frequency/enable");
-        putMarker("1", "tracing_on");
-*/
         putMarker("START: App started\n", "trace_marker");
 
         putMarker("\"EVENT\":\"DATABASE_OPEN_START\"}\n","trace_marker");
@@ -57,21 +45,18 @@ public class MainActivity extends Activity {
 
         if(!isTableExists) {
 
-            putMarker("{\"EVENT\":\"CREATE_START\"}", "trace_marker");
-            db.execSQL("CREATE TABLE employee (id INTEGER PRIMARY KEY, name TEXT, dept INTEGER, designation TEXT)");
+	    putMarker("{\"EVENT\":\"CREATE_START\"}", "trace_marker");
+            db.execSQL("CREATE TABLE dept (id INTEGER PRIMARY KEY, name TEXT) ");
             putMarker("{\"EVENT\":\"CREATE_END\"}", "trace_marker");
 
-            Random random = new Random();
-            String sql = "INSERT INTO employee VALUES(?,?,?,?)";
+            String sql = "INSERT INTO dept VALUES(?,?)";
             putMarker("{\"EVENT\":\"TRANSACTION_START\"}", "trace_marker");
             db.beginTransaction();
             SQLiteStatement stmt = db.compileStatement(sql);
-            for (int i = 0; i < 500; i++) {
+            for (int i = 1; i < 11; i++) {
                 putMarker("{\"EVENT\":\"INSERT_START\"}", "trace_marker");
-                stmt.bindLong(1,i);
-                stmt.bindString(2, "John Doe");
-                stmt.bindLong(3, random.nextInt() % 10);
-                stmt.bindString(4,"temp Dept");
+                stmt.bindLong(1, i);
+                stmt.bindString(2, "Dept"+i);
                 stmt.execute();
                 stmt.clearBindings();
                 //db.execSQL("INSERT INTO contacts VALUES(" + i + ",'John Doe','9898889889')");
@@ -81,29 +66,28 @@ public class MainActivity extends Activity {
             db.endTransaction();
             putMarker("{\"EVENT\":\"TRANSACTION_END\"}", "trace_marker");
 
-
-            putMarker("{\"EVENT\":\"CREATE_START\"}", "trace_marker");
-            db.execSQL("CREATE TABLE contacts (id INTEGER PRIMARY KEY, name TEXT, number TEXT, FOREIGN KEY(id) REFERENCES employee(id))");
+            Random random = new Random();
+            putmarker("{\"EVENT\":\"CREATE_START\"}", "trace_marker");
+            db.execSQL("CREATE TABLE employee (id INTEGER PRIMARY KEY, name TEXT, dept INTEGER, designation TEXT, FOREIGN KEY(dept) REFERENCES dept(id))");
             putMarker("{\"EVENT\":\"CREATE_END\"}", "trace_marker");
 
-            String sql = "INSERT INTO contacts VALUES(?,?,?)";
+            sql = "INSERT INTO employee VALUES(?,?,?,?)";
             putMarker("{\"EVENT\":\"TRANSACTION_START\"}", "trace_marker");
             db.beginTransaction();
             stmt = db.compileStatement(sql);
             for (int i = 0; i < 500; i++) {
                 putMarker("{\"EVENT\":\"INSERT_START\"}", "trace_marker");
-                stmt.bindLong(1,i);
-                stmt.bindString(2, "John Doe");
-                stmt.bindString(3,"9797997922");
+                stmt.bindLong(1, i);
+                stmt.bindString(2, "John Doe"+random.nextInt() % 20);
+                stmt.bindLong(3, random.nextInt() % 10 + 1);
+                stmt.bindString(4,"Designation");
                 stmt.execute();
                 stmt.clearBindings();
-                //db.execSQL("INSERT INTO contacts VALUES(" + i + ",'John Doe','9898889889')");
                 putMarker("{\"EVENT\":\"INSERT_END\"}", "trace_marker");
             }
             db.setTransactionSuccessful();
             db.endTransaction();
             putMarker("{\"EVENT\":\"TRANSACTION_END\"}", "trace_marker");
-
             putMarker("{\"EVENT\":\"CLOSE_START\"}\n", "trace_marker");
             db.close();
             putMarker("{\"EVENT\":\"CLOSE_END\"}\n", "trace_marker");
@@ -132,12 +116,15 @@ public class MainActivity extends Activity {
                         type = reader.nextString();
                     }
                 }
+		reader.endObject();
                 if(type.equals("SELECT")) {
                     putMarker("{\"EVENT\":\"SELECT_START\"}\n","trace_marker");
                     Cursor cursor = db.rawQuery(query,null);
                     if(cursor.moveToFirst()) {
                         do {
-                            //process cursor
+				for(int j=0; j< numColumns; j++) {
+                                	//String temp = cursor.toString();
+                            	}
                         } while(cursor.moveToNext());
                     }
                     putMarker("{\"EVENT\":\"SELECT_END\"}\n","trace_marker");
@@ -147,6 +134,7 @@ public class MainActivity extends Activity {
                     putMarker("{\"EVENT\":\""+type+"_END\"}\n","trace_marker");
                 }
             }
+	    reader.endArray();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -158,46 +146,9 @@ public class MainActivity extends Activity {
             putMarker("\"EVENT\":\"DATABASE_CLOSE_END\"}\n","trace_marker");
         }
 
-        /*
-        //putMarker("\"EVENT\":\"DATABASE_OPEN_START\"}\n","trace_marker");
-        db = SQLiteDatabase.openDatabase(this.getDatabasePath("Contacts").getPath(), null, SQLiteDatabase.OPEN_READONLY);
-        //putMarker("\"EVENT\":\"DATABASE_OPEN_END\"}\n","trace_marker");
-
-        putMarker("{\"EVENT\":\"SELECT_START\"}\n","trace_marker");
-        Cursor cursor = db.rawQuery("SELECT * FROM contacts;", null);
-        if (cursor.moveToFirst()) {
-            do {
-                int id = Integer.parseInt(cursor.getString(0));
-                String name = cursor.getString(1);
-                String number = cursor.getString(2);
-            } while (cursor.moveToNext());
-        }
-        putMarker("{\"EVENT\":\"SELECT_END\"}\n","trace_marker");
-
-        putMarker("{\"EVENT\":\"CLOSE_START\"}\n", "trace_marker");
-        db.close();
-        putMarker("{\"EVENT\":\"CLOSE_END\"}\n","trace_marker");
-*/
-
+        
         putMarker("END: app finished\n", "trace_marker");
-    /*    putMarker("0", "events/kmem/kmalloc/enable");
-        putMarker("0", "events/kmem/kfree/enable");
-        putMarker("0", "events/kmem/kmem_cache_alloc/enable");
-        putMarker("0", "events/kmem/kmem_cache_free/enable");
-        putMarker("0", "events/sched/sched_switch/enable");
-        putMarker("0", "events/sched/sched_stat_runtime/enable");
-        putMarker("0", "events/power/cpu_frequency_switch_end/enable");
-        putMarker("0","events/power/cpu_frequency_switch_start/enable");
-        putMarker("0", "events/power/cpu_frequency/enable");
-        putMarker("0", "tracing_on");
-
-        try {
-            Process copy = Runtime.getRuntime().exec("sh -c cat /sys/kernel/debug/tracing/trace > /data/log.log");
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
-    */
-        this.finishAffinity();
+            this.finishAffinity();
 
     }
 
@@ -216,16 +167,4 @@ public class MainActivity extends Activity {
                 outStream.close();
         }
     }
-/*
-    public static void echoFunc(String val, String filename) {
-        try{
-            Process echoProc = Runtime.getRuntime().exec("sh -c echo " + val + " > " + "/sys/kernel/debug/tracing/");
-            echoProc.waitFor();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw  new RuntimeException(e);
-        }
-
-    }*/
 }

@@ -13,6 +13,6 @@
 	},
 	{
 		"type":"UPDATE",
-		"query":"UPDATE employee SET name = ‘Jane Doe4’ WHERE n= 'John Doe17';"
+		"query":"UPDATE employee SET name = 'Jane Doe4' WHERE name = 'John Doe17';"
 	}
 ]

@@ -1,0 +1,18 @@
+[
+	{
+		"type":"SELECT",
+		"query":"SELECT * FROM employee;"
+	},
+	{
+		"type":"INSERT",
+		"query":"INSERT INTO employee VALUES (610, 'Jane Doe7', 15, 'Designation5');"
+	},
+	{
+		"type":"DELETE",
+		"query":"DELETE FROM employee WHERE name = 'Jane Doe7';"
+	},
+	{
+		"type":"UPDATE",
+		"query":"UPDATE employee SET name = ‘Jane Doe4’ WHERE n= 'John Doe17';"
+	}
+]

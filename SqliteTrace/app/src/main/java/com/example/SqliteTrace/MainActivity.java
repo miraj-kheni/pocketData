@@ -13,11 +13,13 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Random;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.net.LocalSocketAddress;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ import android.util.JsonReader;
 
 public class MainActivity extends Activity {
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +56,6 @@ public class MainActivity extends Activity {
         }
 
 
-
         putMarker("START: App started\n", "trace_marker");
 
         putMarker("\"EVENT\":\"DATABASE_OPEN_START\"}\n","trace_marker");
@@ -67,6 +69,8 @@ public class MainActivity extends Activity {
         if(cursor1.moveToFirst()) {
             isTableExists = true;
         }
+
+
 
         if(!isTableExists) {
 
@@ -128,10 +132,11 @@ public class MainActivity extends Activity {
 
         String type = "";
         String query = "";
-        InputStream queryFile;
+        FileInputStream queryFile;
         try {
+          //  putMarker("\"EVENT\":\"TEST\"}\n","trace_marker");
             queryFile = this.openFileInput("query.log");
-
+         //   putMarker("\"EVENT\":\"TEST\"}\n","trace_marker");
             JsonReader reader = new JsonReader(new InputStreamReader(queryFile,"UTF-8"));
             reader.beginArray();
             while(reader.hasNext()) {
